@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 81f5609aef0fd0e4aa1ed7460f4071e6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281682
+  packageName: Range Slider
+  packageVersion: 1.0
+  assetPath: Assets/UIRangeSlider/Scripts/Editor/UIRangeSliderEditor.cs
+  uploadId: 656533

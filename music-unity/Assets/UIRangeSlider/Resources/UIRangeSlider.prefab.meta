@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f4eb5dadfdd467f409d7271c4452081f
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281682
+  packageName: Range Slider
+  packageVersion: 1.0
+  assetPath: Assets/UIRangeSlider/Resources/UIRangeSlider.prefab
+  uploadId: 656533

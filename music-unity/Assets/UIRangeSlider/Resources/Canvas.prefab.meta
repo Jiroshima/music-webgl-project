@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c92430dd4d6fe42499840d5a0950977a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281682
+  packageName: Range Slider
+  packageVersion: 1.0
+  assetPath: Assets/UIRangeSlider/Resources/Canvas.prefab
+  uploadId: 656533

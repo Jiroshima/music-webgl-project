@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2d72e0bb0294ea64d8f8fd4d4d7813e5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281682
+  packageName: Range Slider
+  packageVersion: 1.0
+  assetPath: Assets/UIRangeSlider/Scripts/MultipleDisplayUtilities.cs
+  uploadId: 656533

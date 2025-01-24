@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d675398a9239fac4ab292f4d25eacd10
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281682
+  packageName: Range Slider
+  packageVersion: 1.0
+  assetPath: Assets/UIRangeSlider/Scripts/Editor/ContextMenuUtility.cs
+  uploadId: 656533

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8f5dccd5754b2ea4caa0790dfa6d1fef
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 281682
+  packageName: Range Slider
+  packageVersion: 1.0
+  assetPath: Assets/UIRangeSlider/Examples/Scripts/LabeledSlider.cs
+  uploadId: 656533
