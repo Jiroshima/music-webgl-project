@@ -6,7 +6,11 @@ using System;
 public class SoundSynthesizer : MonoBehaviour
 {
     public AudioSource audioSource;
-    public AudioClip externalClip;  // External audio clip field
+
+    // Audio Sample Management
+    public AudioClip[] audioSamples; // Assign 6 audio clips in Inspector
+    public Button[] sampleButtons; // Assign 6 buttons in Inspector
+    private int currentSampleIndex = -1; // No sample selected initially
 
     public float pitch = 1f;        // Pitch of the audio
     public float volume = 1f;       // Volume (amplitude)
@@ -22,6 +26,7 @@ public class SoundSynthesizer : MonoBehaviour
     public TMP_Text pitchValueText;  // Text to display pitch value
     public TMP_Text volumeValueText; // Text to display volume value
     public TMP_Text playbackRateValueText; // Text to display playback rate value
+    public TMP_Text playbackTimeText; // Text to display current playback time and total duration
 
     public LineRenderer lineRenderer;
     public TMP_Text infoText;
@@ -39,13 +44,17 @@ public class SoundSynthesizer : MonoBehaviour
     {
         // Get the AudioSource component
         audioSource = GetComponent<AudioSource>();
-
-        // Optionally, assign external clip
-        if (externalClip != null)
-        {
-            audioSource.clip = externalClip;
-        }
         audioSource.loop = true;
+
+        // Setup sample selection buttons
+        for (int i = 0; i < sampleButtons.Length; i++)
+        {
+            int index = i; // Capture the current index for the lambda
+            sampleButtons[i].onClick.AddListener(() => SelectAudioSample(index));
+        }
+
+        // Disable play button initially
+        playPauseButton.interactable = false;
 
         // Link sliders and set initial values
         pitchSlider.onValueChanged.AddListener(UpdatePitch);
@@ -94,9 +103,51 @@ public class SoundSynthesizer : MonoBehaviour
         // Ensure the LineRenderer is on the 2D plane
         lineRenderer.transform.position = new Vector3(lineRenderer.transform.position.x, lineRenderer.transform.position.y, 0f);
 
-        // Generate the waveform with the sine wave
-        SetWaveformToSine();
+        // Initialize playback time text
+        UpdatePlaybackTimeText();
+
+        // Disable LineRenderer at the start (clear any unwanted initial line)
+        lineRenderer.positionCount = 0; // This ensures there's no line visible initially
     }
+
+    // New method to select audio sample
+    private void SelectAudioSample(int sampleIndex)
+    {
+        // Deselect previous buttons
+        for (int i = 0; i < sampleButtons.Length; i++)
+        {
+            ColorBlock colors = sampleButtons[i].colors;
+            colors.normalColor = Color.white;
+            sampleButtons[i].colors = colors;
+        }
+
+        // Highlight selected button
+        ColorBlock selectedColors = sampleButtons[sampleIndex].colors;
+        selectedColors.normalColor = Color.green;
+        sampleButtons[sampleIndex].colors = selectedColors;
+
+        // Set the audio clip
+        audioSource.clip = audioSamples[sampleIndex];
+        currentSampleIndex = sampleIndex;
+
+        // Reset playback
+        audioSource.Stop();
+        isPlaying = false;
+        playPauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play";
+
+        // Enable play button
+        playPauseButton.interactable = true;
+
+        // Update playback time text
+        UpdatePlaybackTimeText();
+
+        // Visualize the waveform of the selected sample
+        VisualizeWaveformFromAudio();
+
+        // Enable LineRenderer after selecting the sample (if previously disabled)
+        lineRenderer.positionCount = 0; // Reset any previous waveform line
+    }
+
 
     private void Update()
     {
@@ -123,11 +174,58 @@ public class SoundSynthesizer : MonoBehaviour
             UpdateAudioInfoStatic();
         }
 
-        // Update playback slider based on audio time
+        // Update playback slider and time text based on audio time
         if (audioSource.isPlaying)
         {
             playbackSlider.value = audioSource.time / audioSource.clip.length; // Update playback slider value
+            UpdatePlaybackTimeText();
         }
+    }
+
+    // Toggle play and pause state
+    private void TogglePlayPause()
+    {
+        if (currentSampleIndex == -1) return; // No sample selected
+
+        if (!isPlaying)
+        {
+            audioSource.Play();
+            isPlaying = true;
+            playPauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
+        }
+        else
+        {
+            audioSource.Pause();
+            isPlaying = false;
+            playPauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play";
+        }
+    }
+
+    // Remaining methods from the previous script stay exactly the same
+    // (UpdatePlaybackTimeText, FormatTime, UpdatePitch, UpdateVolume, etc.)
+    // ... [All previous methods remain unchanged]
+
+    // Update playback time text
+    private void UpdatePlaybackTimeText()
+    {
+        if (audioSource.clip != null)
+        {
+            string currentTime = FormatTime(audioSource.time);
+            string totalTime = FormatTime(audioSource.clip.length);
+            playbackTimeText.text = $"{currentTime} / {totalTime}";
+        }
+        else
+        {
+            playbackTimeText.text = "00:00 / 00:00";
+        }
+    }
+
+    // Format time in minutes:seconds
+    private string FormatTime(float time)
+    {
+        int minutes = Mathf.FloorToInt(time / 60);
+        int seconds = Mathf.FloorToInt(time % 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
     // Update pitch from the slider
@@ -152,28 +250,6 @@ public class SoundSynthesizer : MonoBehaviour
         playbackRate = value;
         audioSource.pitch = playbackRate; // Update the playback rate (also affects pitch)
         playbackRateValueText.text = playbackRate.ToString("F2") + "x"; // Now displaying "x" for playback rate
-    }
-
-    // Toggle play and pause state
-    private void TogglePlayPause()
-    {
-        if (!isPlaying)
-        {
-            if (audioSource.clip == null)
-            {
-                GenerateWaveform(); // If no clip is assigned, generate the waveform first
-            }
-
-            audioSource.Play();
-            isPlaying = true;  // Set the state to playing
-            playPauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause"; // Update button text to "Pause"
-        }
-        else
-        {
-            audioSource.Pause();
-            isPlaying = false; // Set the state to paused
-            playPauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play"; // Update button text to "Play"
-        }
     }
 
     // Generate waveform sound based on selected parameters
@@ -201,6 +277,9 @@ public class SoundSynthesizer : MonoBehaviour
         AudioClip waveformClip = AudioClip.Create("Waveform", data.Length, 1, AudioSettings.outputSampleRate, false);
         waveformClip.SetData(data, 0);
         audioSource.clip = waveformClip;
+
+        // Update playback time text after generating waveform
+        UpdatePlaybackTimeText();
     }
 
     // Visualize the waveform for the generated wave (used when no external audio is playing)
@@ -235,27 +314,30 @@ public class SoundSynthesizer : MonoBehaviour
         float[] data = new float[1024];
 
         // Get the waveform data from the audio source using GetOutputData
-        audioSource.GetOutputData(data, 0);
-
-        Vector3[] positions = new Vector3[data.Length];
-
-        float scaleX = 0.005f; // Adjust this for the horizontal scale of the waveform
-        float scaleY = 0.5f;   // Adjust this for the vertical scale (amplitude)
-
-        for (int i = 0; i < data.Length; i++)
+        if (audioSource.clip != null)
         {
-            float sample = data[i];
+            audioSource.GetOutputData(data, 0);
 
-            // Scale and offset the positions so it's visible and centered within the UI panel
-            positions[i] = new Vector3(i * scaleX - (data.Length * scaleX / 2), sample * scaleY, 0);
+            Vector3[] positions = new Vector3[data.Length];
+
+            float scaleX = 0.005f; // Adjust this for the horizontal scale of the waveform
+            float scaleY = 0.5f;   // Adjust this for the vertical scale (amplitude)
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                float sample = data[i];
+
+                // Scale and offset the positions so it's visible and centered within the UI panel
+                positions[i] = new Vector3(i * scaleX - (data.Length * scaleX / 2), sample * scaleY, 0);
+            }
+
+            // Update the LineRenderer's positions to visualize the waveform
+            lineRenderer.positionCount = positions.Length;
+            lineRenderer.SetPositions(positions);
+
+            // Adjust the local position of the waveform inside the container
+            lineRenderer.transform.localPosition = Vector3.zero;
         }
-
-        // Update the LineRenderer's positions to visualize the waveform
-        lineRenderer.positionCount = positions.Length;
-        lineRenderer.SetPositions(positions);
-
-        // Adjust the local position of the waveform inside the container
-        lineRenderer.transform.localPosition = Vector3.zero;
     }
 
     // Method to calculate peak frequency using FFT
@@ -316,12 +398,7 @@ public class SoundSynthesizer : MonoBehaviour
         if (audioSource.clip != null)
         {
             audioSource.time = value * audioSource.clip.length;
+            UpdatePlaybackTimeText(); // Update time text when slider is changed
         }
-    }
-
-    // Set waveform to sine wave (only option)
-    private void SetWaveformToSine()
-    {
-        // No longer necessary to set anything as it's fixed in the script
     }
 }
